@@ -23,7 +23,8 @@ Analyze any website using OpenAI-powered audits via N8n backend and a clean fron
 2. Click "Run Audit"
 3. Wait for the AI-powered report to appear
 
-## 🔗 Live Demo (https://gmafsd775.github.io/live-seo-audit-tool)
+## 🔗 Live Demo https://gmafsd775.github.io/live-seo-audit-tool
+https://gmafsd775.github.io/Live-SEO-Audit-Tool/
 
 ## 🛠️ Future Upgrades
 
