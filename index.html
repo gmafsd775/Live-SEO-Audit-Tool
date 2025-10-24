@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebInsight Pro | AI-Powered Website Analysis</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --darker: #111827;
+            --light: #f8fafc;
+            --gray: #6b7280;
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+        
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px 35px;
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.1),
+                0 0 0 1px rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .primary-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            width: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .primary-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+        }
+        
+        .spinner-container {
+            position: relative;
+            margin: 30px 0;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        .spinner-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-container {
+            margin: 30px 0;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 10px;
+        }
+        
+        .status-list {
+            margin-top: 25px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .status-icon {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .badge-processing {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        
+        .badge-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .results-section {
+            display: none;
+        }
+        
+        .success-card {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 25px;
+            animation: bounceIn 0.6s ease;
+        }
+        
+        .success-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #065f46;
+        }
+        
+        .feature-grid {
+            display: grid;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--light);
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-icon {
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+        
+        .secondary-btn {
+            background: white;
+            color: var(--dark);
+            border: 2px solid #e5e7eb;
+            padding: 14px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .secondary-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+        
+        .n8n-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+                padding: 10px;
+            }
+            
+            .glass-card {
+                padding: 30px 25px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-chart-network"></i>
+            </div>
+            <h1>WebInsight Pro</h1>
+            <p>AI-Powered Website Analysis & Audit</p>
+        </div>
+        
+        <div class="glass-card">
+            <div class="input-section" id="inputSection">
+                <h2 style="text-align: center; margin-bottom: 10px; color: var(--dark);">Start Analysis</h2>
+                <p style="text-align: center; color: var(--gray); margin-bottom: 30px; font-size: 0.95rem;">
+                    Enter website details for comprehensive technical and content audit
+                </p>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-globe-americas"></i> Website Address
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-link input-icon"></i>
+                        <input type="url" class="form-input" id="websiteUrl" 
+                               placeholder="Enter website URL (https://...)" 
+                               pattern="https?://.+" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-envelope"></i> Email for Report
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-at input-icon"></i>
+                        <input type="email" class="form-input" id="userEmail" 
+                               placeholder="your.email@company.com" required>
+                    </div>
+                </div>
+                
+                <button class="primary-btn" id="scanBtn">
+                    <i class="fas fa-rocket"></i>
+                    Launch Analysis
+                </button>
+                
+                <div style="text-align: center; margin-top: 25px;">
+                    <div class="n8n-badge">
+                        <i class="fas fa-plug"></i>
+                        N8N Integration Active
+                    </div>
+                </div>
+            </div>
+            
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                    <div class="spinner-inner">Processing</div>
+                </div>
+                
+                <h3 style="text-align: center; margin-bottom: 20px; color: var(--dark);">
+                    Analyzing Website...
+                </h3>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress" id="progressBar"></div>
+                    </div>
+                </div>
+                
+                <div class="status-list" id="statusMessages">
+                    <div class="status-item">
+                        <div class="status-info">
+                            <div class="status-icon">
+                                <i class="fas fa-cloud-download-alt"></i>
+                            </div>
+                            <span>Initializing Analysis Engine</span>
+                        </div>
+                        <span class="badge badge-pending" id="statusInit">Pending</span>
+                    </div>
+                    
+                    <div class="status-item">
+                        <div class="status-info">
+                            <div class="status-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <span>Technical Structure Analysis</span>
+                        </div>
+                        <span class="badge badge-pending" id="statusTechnical">Pending</span>
+                    </div>
+                    
+                    <div class="status-item">
+                        <div class="status-info">
+                            <div class="status-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <span>Content Quality Audit</span>
+                        </div>
+                        <span class="badge badge-pending" id="statusContent">Pending</span>
+                    </div>
+                    
+                    <div class="status-item">
+                        <div class="status-info">
+                            <div class="status-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <span>SEO & Performance Check</span>
+                        </div>
+                        <span class="badge badge-pending" id="statusSeo">Pending</span>
+                    </div>
+                    
+                    <div class="status-item">
+                        <div class="status-info">
+                            <div class="status-icon">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                            <span>Generating Report</span>
+                        </div>
+                        <span class="badge badge-pending" id="statusReport">Pending</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results-section" id="resultsSection">
+                <div class="success-card">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 style="color: #065f46; margin-bottom: 8px;">Analysis Complete!</h3>
+                    <p style="color: #047857; font-size: 0.95rem;">
+                        Comprehensive report has been sent to your email
+                    </p>
+                </div>
+                
+                <h4 style="margin-bottom: 15px; color: var(--dark);">What's Included in Your Report:</h4>
+                
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-bolt feature-icon"></i>
+                        <span>Performance Metrics & Scores</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-mobile-alt feature-icon"></i>
+                        <span>Mobile Responsiveness Analysis</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt feature-icon"></i>
+                        <span>Security & SEO Recommendations</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line feature-icon"></i>
+                        <span>Content Optimization Tips</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 25px;">
+                    <button class="secondary-btn" id="newAuditBtn">
+                        <i class="fas fa-plus"></i>
+                        Start New Analysis
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const scanBtn = document.getElementById('scanBtn');
+            const websiteUrl = document.getElementById('websiteUrl');
+            const userEmail = document.getElementById('userEmail');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const resultsSection = document.getElementById('resultsSection');
+            const inputSection = document.getElementById('inputSection');
+            const progressBar = document.getElementById('progressBar');
+            const newAuditBtn = document.getElementById('newAuditBtn');
+            
+            // N8N Webhook URL
+            const N8N_WEBHOOK_URL = 'https://n8n.srv1060272.hstgr.cloud/webhook/Website-checker';
+            
+            // Status elements
+            const statusInit = document.getElementById('statusInit');
+            const statusTechnical = document.getElementById('statusTechnical');
+            const statusContent = document.getElementById('statusContent');
+            const statusSeo = document.getElementById('statusSeo');
+            const statusReport = document.getElementById('statusReport');
+            
+            scanBtn.addEventListener('click', startAnalysis);
+            newAuditBtn.addEventListener('click', resetAnalysis);
+            
+            async function startAnalysis() {
+                if (!validateForm()) return;
+                
+                // UI Transition
+                scanBtn.disabled = true;
+                inputSection.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+                resultsSection.style.display = 'none';
+                
+                try {
+                    // Send to N8N
+                    await sendToN8N();
+                    
+                    // Start progress animation
+                    simulateAnalysisProgress();
+                    
+                } catch (error) {
+                    console.error('Analysis error:', error);
+                    showError('Failed to start analysis. Please try again.');
+                    resetAnalysis();
+                }
+            }
+            
+            function validateForm() {
+                if (!websiteUrl.checkValidity()) {
+                    showError('Please enter a valid website URL starting with http:// or https://');
+                    return false;
+                }
+                
+                if (!userEmail.checkValidity()) {
+                    showError('Please enter a valid email address');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            function showError(message) {
+                alert(message); // In production, use a better notification system
+            }
+            
+            async function sendToN8N() {
+                const payload = {
+                    websiteUrl: websiteUrl.value,
+                    userEmail: userEmail.value,
+                    timestamp: new Date().toISOString(),
+                    analysisType: 'comprehensive',
+                    source: 'webinsight-pro'
+                };
+                
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`N8N workflow error: ${response.status}`);
+                }
+                
+                return await response.json();
+            }
+            
+            function simulateAnalysisProgress() {
+                let progress = 0;
+                const steps = [
+                    { at: 10, element: statusInit, text: 'Completed' },
+                    { at: 30, element: statusTechnical, text: 'Completed' },
+                    { at: 50, element: statusContent, text: 'Completed' },
+                    { at: 70, element: statusSeo, text: 'Completed' },
+                    { at: 90, element: statusReport, text: 'Completed' }
+                ];
+                
+                const interval = setInterval(() => {
+                    progress += 2;
+                    progressBar.style.width = Math.min(progress, 100) + '%';
+                    
+                    // Update status badges
+                    steps.forEach(step => {
+                        if (progress >= step.at) {
+                            step.element.className = 'badge badge-completed';
+                            step.element.textContent = step.text;
+                        }
+                    });
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(showResults, 800);
+                    }
+                }, 80);
+            }
+            
+            function showResults() {
+                loadingSpinner.style.display = 'none';
+                resultsSection.style.display = 'block';
+            }
+            
+            function resetAnalysis() {
+                scanBtn.disabled = false;
+                inputSection.style.display = 'block';
+                loadingSpinner.style.display = 'none';
+                resultsSection.style.display = 'none';
+                
+                // Reset form
+                websiteUrl.value = '';
+                userEmail.value = '';
+                
+                // Reset progress
+                progressBar.style.width = '0%';
+                
+                // Reset status badges
+                [statusInit, statusTechnical, statusContent, statusSeo, statusReport].forEach(status => {
+                    status.className = 'badge badge-pending';
+                    status.textContent = 'Pending';
+                });
+            }
+            
+            // Enter key support
+            [websiteUrl, userEmail].forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        startAnalysis();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
